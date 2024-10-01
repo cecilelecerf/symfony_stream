@@ -8,22 +8,22 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MediaController extends AbstractController
 {
-    #[Route(path: '/media', name: 'category')]
+    #[Route(path: '/category', name: 'category')]
     public function category(): Response
     {
         return $this->render(view: "/media/category.html.twig");
     }
-    #[Route(path: '/media', name: 'detail_serie')]
+    #[Route(path: '/detailSerie', name: 'detail_serie')]
     public function detail_serie(): Response
     {
         return $this->render(view: "/media/detail_serie.html.twig");
     }
-    #[Route(path: '/media', name: 'detail')]
+    #[Route(path: '/detail', name: 'detail')]
     public function detail(): Response
     {
         return $this->render(view: "/media/detail.html.twig");
     }
-    #[Route(path: '/media', name: 'lists')]
+    #[Route(path: '/lists', name: 'lists')]
     public function lists(): Response
     {
         return $this->render(view: "/media/lists.html.twig");
