@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\MediaMediaTypeEnum;
 use App\Repository\MediaRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,8 +15,8 @@ class Media
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    private array $media_type = [];
+    #[ORM\Column(enumType: MediaMediaTypeEnum::class)]
+    private MediaMediaTypeEnum $media_type;
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;
@@ -43,12 +44,12 @@ class Media
         return $this->id;
     }
 
-    public function getMediaType(): array
+    public function getMediaType(): MediaMediaTypeEnum
     {
         return $this->media_type;
     }
 
-    public function setMediaType(array $media_type): self
+    public function setMediaType(MediaMediaTypeEnum $media_type): self
     {
         $this->media_type = $media_type;
 

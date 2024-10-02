@@ -2,7 +2,10 @@
 {% block title %}Recommandations
 {% endblock %}
 {% block content_layout %}
-	{% include "parts/random_movie.html.twig" %}
+	<section>
+		{% include "parts/menu_media_type.html.twig" %}
+		{% include "parts/movie/random_movie.html.twig" %}
+	</section>
 	{% include "parts/recommendation.html.twig" %}
 
 	<section class="mt-9">
