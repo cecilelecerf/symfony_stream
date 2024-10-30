@@ -14,11 +14,9 @@
 		</div>
 
 		<div class="mt-4 grid grid-cols-2 gap-y-5 sm:grid-cols-3 gap-x-5">
-			{% include "parts/category_card.html.twig" %}
-			{% include "parts/category_card.html.twig" %}
-			{% include "parts/category_card.html.twig" %}
-			{% include "parts/category_card.html.twig" %}
-
+    {% for category in categories %}
+			{% include "parts/category_card.html.twig" %} 
+  {% endfor %}
 
 		</div>
 	</section>

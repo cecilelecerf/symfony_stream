@@ -3,14 +3,8 @@
 		<span class="font-bold text-red-600">Casting</span>
 	</h2>
 	<ul class="mt-9 grid grid-cols-2 sm:grid-cols-4 gap-x-5 gap-y-5">
-
+{% for people in media.casting %}
 		{% include "/parts/movie/detail/actor_card.html.twig" %}
-		{% include "/parts/movie/detail/actor_card.html.twig" %}
-		{% include "/parts/movie/detail/actor_card.html.twig" %}
-		{% include "/parts/movie/detail/actor_card.html.twig" %}
-		{% include "/parts/movie/detail/actor_card.html.twig" %}
-		{% include "/parts/movie/detail/actor_card.html.twig" %}
-		{% include "/parts/movie/detail/actor_card.html.twig" %}
-		{% include "/parts/movie/detail/actor_card.html.twig" %}
+    {% endfor %} 
 	</ul>
 </div>

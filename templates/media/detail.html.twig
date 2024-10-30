@@ -4,7 +4,7 @@
 {% block content_layout %}
 	<section class="">
 		<h1 class="text-lg font-medium text-black">Détails de
-			<span class="font-bold text-red-600">Interstellar</span>
+			<span class="font-bold text-red-600">{{media.title}}</span>
 		</h1>
 		<div class="flex flex-col items-center mt-9">
 			<a class="relative flex w-full flex-row p-3 items-center justify-center rounded-lg overflow-hidden border hover:scale-105 cursor-pointer transition hover:bg-gray-100">
@@ -52,8 +52,11 @@
 					</div>
 					<div class="text-right space-x-1">
 						<span class="bg-white/30 py-1 px-3 text-xxs rounded">1h42m restants</span>
-						<span class="bg-white/30 py-1 px-3 text-xxs rounded">12 visionnages</span>
-						<span class="bg-white/30 py-1 px-3 text-xxs rounded">38 commentaires</span>
+
+						<span class="bg-white/30 py-1 px-3 text-xxs rounded">{{media.watchHistories | length}}
+							visionnages</span>
+						<span class="bg-white/30 py-1 px-3 text-xxs rounded">{{media.comments | length}}
+							commentaires</span>
 					</div>
 				</div>
 			</div>
@@ -68,7 +71,8 @@
 			<div class=" font-medium mt-8 bg-gray-100 border border-black/10 rounded-lg px-8 py-4">
 				<svg class="h-5 w-5 fill-current opacity-50 mr-2 inline-block" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24">
 					<title>information</title><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
-				Vous avez vu ce film
+				Vous avez vu
+				{{ media.isFilm() ?  "ce film" : "cette série" }}
 				<span class="text-red-600 font-bold">43 fois</span>
 				soit un total de
 				<span class="text-red-600 font-bold">190 heures</span>
@@ -81,11 +85,18 @@
 		<div class="max-w-3xl mx-auto">
 			<h2 class="text-lg font-medium text-black">
 				<span class="font-bold text-red-600">Infos</span>
-				du film</h2>
+				{{ media.isFilm() ?  "du film" : "de la série" }}</h2>
+
 			<div class="flex items-center flex-wrap mt-9">
-				<span class="flex bg-black/10 m-0.5 px-1 py-0.5 rounded">
-					<b class="mr-2">Durée</b>
-					2h40 mins</span>
+				{% if media.isFilm() %}
+					<span class="flex bg-black/10 m-0.5 px-1 py-0.5 rounded">
+						<b class="mr-2">Durée</b>
+						2h40 mins</span>
+				{% else %}
+					<span class="flex bg-black/10 m-0.5 px-1 py-0.5 rounded">
+						<b class="mr-2">Saisons</b>
+						8</span>
+				{% endif %}
 				<span class="flex bg-black/10 m-0.5 px-1 py-0.5 rounded">
 					<b class="mr-2">Date de sortie</b>
 					21 Octobre 2024</span>
@@ -106,15 +117,26 @@
 						</svg>
 					</span>
 				</span>
-				<span class="flex bg-black/10 m-0.5 px-1 py-0.5 rounded">
-					<b class="mr-2">Langues</b>
-					Français, Anglais, Italien</span>
+				{% if media.languages | length != 0 %}
+					<span class="flex bg-black/10 m-0.5 px-1 py-0.5 rounded">
+						<b class="mr-2">Langues</b>
+						{% for language in media.languages %}
+							{{language.name}}
+						</span>
+					{% endfor %}
+				{% endif %}
 				<span class="flex bg-black/10 m-0.5 px-1 py-0.5 rounded">
 					<b class="mr-2">Sous-titre</b>
 					Français, Anglais</span>
 				<span class="flex bg-black/10 m-0.5 px-1 py-0.5 rounded">
 					<b class="mr-2">Catégories</b>
-					<a href="#" class="hover:text-red-600 underline decoration-red-400 decoration-2">Action</a>,&nbsp;<a href="#" class="hover:text-red-600 underline decoration-red-400 decoration-2">Aventure</a>,&nbsp;<a href="#" class="hover:text-red-600 underline decoration-red-400 decoration-2">Science Fiction</a>
+					{% for category in media.categories %}
+						<a href={{path("category", {"id": category.id} )}} class="hover:text-red-600 underline decoration-red-400 decoration-2">
+							{{category.name | capitalize}}
+						</a>
+						,&nbsp;
+					{% endfor %}
+					<a href="#" class="hover:text-red-600 underline decoration-red-400 decoration-2">Aventure</a>,&nbsp;<a href="#" class="hover:text-red-600 underline decoration-red-400 decoration-2">Science Fiction</a>
 				</span>
 				<span class="flex bg-black/10 m-0.5 px-1 py-0.5 rounded">
 					<b class="mr-2">Bande annonce</b>
@@ -126,22 +148,19 @@
 			<h2 class="text-lg font-medium text-black">Résumé
 				<span class="font-bold text-red-600">rapide</span>
 			</h2>
-			<p class="text-md mt-9">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam, consectetur deleniti deserunt ducimus harum iusto laboriosam minima nobis obcaecati odit officiis omnis quibusdam repellat repudiandae totam voluptas, voluptatem voluptatibus voluptatum.</p>
+			<p class="text-md mt-9">{{media.shortDescription}}</p>
 		</div>
-		{% include "/parts/movie/detail/team.html.twig" %}
-		{% include "/parts/movie/detail/actor.html.twig" %}
-
+		{% if media.staff %}
+			{% include "/parts/movie/detail/team.html.twig" %}
+		{% endif %}
+		{% if media.casting %}
+			{% include "/parts/movie/detail/actor.html.twig" %}
+		{% endif %}
 		<div class="max-w-3xl mx-auto mt-9">
 			<h2 class="text-lg font-medium text-black">Résumé
 				<span class="font-bold text-red-600">détaillé</span>
 			</h2>
-			<p class="text-md mt-9">
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa dolor error ipsa mollitia necessitatibus perferendis perspiciatis quasi, quidem repellendus rerum. Autem culpa eum iusto magnam voluptatem. Autem doloribus esse natus! Ab commodi deserunt eaque eos incidunt laudantium magni neque officiis optio praesentium sint, voluptates!
-				<br><br>Assumenda atque blanditiis dicta ducimus, eligendi ex fuga fugiat hic illo laboriosam maiores natus nemo, officiis pariatur perferendis quasi reiciendis repellat repellendus sit ullam, vitae voluptatem voluptatum? Aliquid amet, animi aspernatur consectetur cumque doloribus impedit nihil quidem recusandae totam. Alias architecto cumque cupiditate expedita laboriosam laudantium magni, minus possimus quisquam quod quos suscipit temporibus tenetur.
-				<br><br>Accusamus adipisci aperiam, assumenda beatae corporis culpa dignissimos dolore dolorem doloremque dolores eveniet libero magnam molestiae molestias nam nulla officiis provident quasi quia quibusdam quod rem repudiandae similique suscipit temporibus velit voluptates. Culpa cum dolor est similique.
-				<br><br>Exercitationem magnam, necessitatibus. Adipisci, amet asperiores aspernatur atque aut commodi cupiditate dolore ea earum et facilis, fuga in laudantium magnam nulla odio quas repudiandae sunt voluptas, voluptatem. Aspernatur, at cumque delectus dicta dolor ipsam laudantium minus mollitia odit pariatur quia suscipit temporibus velit. Aliquid non officia quo sed vero! Aperiam, cupiditate deserunt earum eligendi, esse excepturi impedit ipsam molestias obcaecati odio quibusdam, tempore unde voluptatibus? Asperiores corporis deleniti doloribus dolorum, eius est eum exercitationem iste molestias obcaecati quae quibusdam quisquam recusandae saepe sequi suscipit, tempora? Odit, quia, voluptatem! Doloribus nemo provident quasi quia veniam? Ab, at deserunt distinctio earum eveniet facilis ipsa nisi officia possimus sed suscipit, tempora unde. Architecto corporis delectus fugit quasi rerum tenetur.
-				<br><br>Ad alias aut commodi consectetur consequatur, cumque delectus deleniti, distinctio dolore dolorum enim et excepturi facere facilis fugiat impedit incidunt ipsum labore maiores modi molestiae nam necessitatibus nisi numquam, obcaecati odit officiis perferendis placeat praesentium quaerat quia quos tempora vel? Amet cupiditate labore porro temporibus velit? Assumenda deleniti, rem. Corporis nemo nihil nisi quae totam! Alias aut itaque nostrum qui quia quisquam reiciendis soluta voluptates? Atque aut consectetur dicta distinctio dolor, eum, eveniet ipsam, praesentium recusandae reiciendis sapiente tenetur. Ad alias atque commodi culpa debitis delectus doloribus eaque eligendi est expedita fuga illo ipsam laborum libero modi nemo nobis nulla pariatur porro.
-				<br><br>Quasi quidem quo reiciendis repellendus rerum sequi suscipit, tempore unde velit voluptate voluptatibus? Aperiam architecto cupiditate delectus dolore dolores doloribus earum eius eos in mollitia, non nostrum quasi quidem ratione rem repellendus sequi tempore, velit vitae voluptatum. Cumque, dignissimos dolor ea enim et illo magni mollitia nam nemo omnis, perferendis praesentium quae quidem quo voluptates! Eius harum id in, ipsa libero molestiae omnis provident quasi quisquam saepe, similique voluptates. Ad culpa dolores et explicabo, illo ipsum iusto labore magni nesciunt nisi nobis officiis optio quam quo ullam. Id, inventore iste molestias natus odio officia optio pariatur ut? Animi autem beatae blanditiis cum deserunt dicta dolorum ea eligendi eveniet exercitationem explicabo impedit ipsum laudantium nam nesciunt odit officia pariatur placeat praesentium quam, quasi quia quis quisquam sint soluta tempore temporibus tenetur vero voluptatem voluptatum! Consequuntur ex maiores quam tempore. Aliquam consequatur consequuntur est ex facilis inventore itaque laborum provident quasi quidem, ut voluptas. Beatae consequatur delectus deserunt eligendi est et eveniet explicabo facilis hic illum incidunt ipsum iste magnam nesciunt nobis omnis perspiciatis possimus praesentium quas quia, quo quos recusandae saepe suscipit tempore veniam voluptates voluptatum.</p>
+			<p class="text-md mt-9">{{media.longDescription}}</p>
 		</div>
 	</section>
 	<section class="mt-9">
@@ -150,43 +169,50 @@
 				<span class="font-bold text-red-600">commentaires</span>
 			</h2>
 			<ul class="space-y-4">
-				{% include "parts/movie/detail/comment.html.twig" %}
-				{% include "parts/movie/detail/comment.html.twig" %}
-				{% include "parts/movie/detail/comment.html.twig" %}
-			{# <li class="mt-9 pl-9 border-l-4">
-																			<div class="bg-gray-100 p-4 rounded-lg">
-																				<div class="flex items-center">
-																					<img src="https://random.imagecdn.app/100/100?c" class="w-10 h-10 rounded-full" alt="">
-																					<div class="ml-4 w-full">
-																						<span class="font-medium">Marco Doe</span>
-																						<span class="text-xs text-gray-500 flex items-center justify-between w-full">
-																							<span>Il y a 1 heures</span>
-																							<span></span>
-																						</span>
-																					</div>
-																				</div>
-																				<p class="mt-4 w-full">Lorem ipsum dolor sit amet !!</p>
-																			</div>
-																		</li> #}
+				{% if media.comments | length != 0 %}
+
+					{% for comment in media.comments %}
+						{% include "parts/movie/detail/comment.html.twig" %}
+					{% endfor %}
+				{% else %}
+					<p>Pas de commentaire</p>
+				{% endif %}
+				{# <li class="mt-9 pl-9 border-l-4">
+																																																																																																																																									<div class="bg-gray-100 p-4 rounded-lg">
+																																																																																																																																										<div class="flex items-center">
+																																																																																																																																											<img src="https://random.imagecdn.app/100/100?c" class="w-10 h-10 rounded-full" alt="">
+																																																																																																																																											<div class="ml-4 w-full">
+																																																																																																																																												<span class="font-medium">Marco Doe</span>
+																																																																																																																																												<span class="text-xs text-gray-500 flex items-center justify-between w-full">
+																																																																																																																																													<span>Il y a 1 heures</span>
+																																																																																																																																													<span></span>
+																																																																																																																																												</span>
+																																																																																																																																											</div>
+																																																																																																																																										</div>
+																																																																																																																																										<p class="mt-4 w-full">Lorem ipsum dolor sit amet !!</p>
+																																																																																																																																									</div>
+																																																																																																																																								</li> #}
 				{# <li class="mt-9 pl-9 border-l-4 relative cursor-not-allowed">
-																					<span class="absolute top-2 right-2 px-3 py-1 bg-orange-100 rounded-md">En attente de vérification</span>
-																					<div class="bg-gray-100 p-4 rounded-lg opacity-40">
-																						<div class="flex items-center">
-																							<img src="https://random.imagecdn.app/100/100?c" class="w-10 h-10 rounded-full" alt="">
-																							<div class="ml-4 w-full">
-																								<span class="font-medium">Harry Potter</span>
-																								<span class="text-xs text-gray-500 flex items-center justify-between w-full">
-																									<span>Il y a 1O secondes</span>
-																									<span></span>
-																								</span>
-																							</div>
-																						</div>
-																						<p class="mt-4 w-full">Lorem ipsum dolor sit amet !!</p>
-																					</div>
-																				</li> #}
+																																																																																																																																											<span class="absolute top-2 right-2 px-3 py-1 bg-orange-100 rounded-md">En attente de vérification</span>
+																																																																																																																																											<div class="bg-gray-100 p-4 rounded-lg opacity-40">
+																																																																																																																																												<div class="flex items-center">
+																																																																																																																																													<img src="https://random.imagecdn.app/100/100?c" class="w-10 h-10 rounded-full" alt="">
+																																																																																																																																													<div class="ml-4 w-full">
+																																																																																																																																														<span class="font-medium">Harry Potter</span>
+																																																																																																																																														<span class="text-xs text-gray-500 flex items-center justify-between w-full">
+																																																																																																																																															<span>Il y a 1O secondes</span>
+																																																																																																																																															<span></span>
+																																																																																																																																														</span>
+																																																																																																																																													</div>
+																																																																																																																																												</div>
+																																																																																																																																												<p class="mt-4 w-full">Lorem ipsum dolor sit amet !!</p>
+																																																																																																																																											</div>
+																																																																																																																																										</li> #}
 			</ul>
 			<form class="mt-9 bg-gray-100 p-4 rounded-lg">
-				<h3 class="text-center text-md font-bold my-4">Réagir / commenter le film ?</h3>
+				<h3 class="text-center text-md font-bold my-4">Réagir / commenter
+					{{ media.isFilm() ?  "le film" : "la série" }}
+					?</h3>
 				<div class="relative">
 					<textarea rows="5" class="w-full px-8 py-4 rounded-lg font-medium bg-white border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white" placeholder="Votre commentaire"></textarea>
 				</div>

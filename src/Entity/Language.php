@@ -15,18 +15,21 @@ class Language
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 3)]
     private ?string $code = null;
 
-    #[ORM\OneToMany(mappedBy: 'language', targetEntity: MediaLanguage::class, orphanRemoval: true)]
-    private Collection $mediaLanguages;
+    /**
+     * @var Collection<int, Media>
+     */
+    #[ORM\ManyToMany(targetEntity: Media::class, mappedBy: 'languages')]
+    private Collection $medias;
 
     public function __construct()
     {
-        $this->mediaLanguages = new ArrayCollection();
+        $this->medias = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -39,7 +42,7 @@ class Language
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -51,7 +54,7 @@ class Language
         return $this->code;
     }
 
-    public function setCode(string $code): self
+    public function setCode(string $code): static
     {
         $this->code = $code;
 
@@ -59,30 +62,27 @@ class Language
     }
 
     /**
-     * @return Collection<int, MediaLanguage>
+     * @return Collection<int, Media>
      */
-    public function getMediaLanguages(): Collection
+    public function getMedias(): Collection
     {
-        return $this->mediaLanguages;
+        return $this->medias;
     }
 
-    public function addMediaLanguage(MediaLanguage $mediaLanguage): self
+    public function addMedia(Media $media): static
     {
-        if (!$this->mediaLanguages->contains($mediaLanguage)) {
-            $this->mediaLanguages->add($mediaLanguage);
-            $mediaLanguage->setLanguage($this);
+        if (!$this->medias->contains($media)) {
+            $this->medias->add($media);
+            $media->addLanguage($this);
         }
 
         return $this;
     }
 
-    public function removeMediaLanguage(MediaLanguage $mediaLanguage): self
+    public function removeMedia(Media $media): static
     {
-        if ($this->mediaLanguages->removeElement($mediaLanguage)) {
-            // set the owning side to null (unless already changed)
-            if ($mediaLanguage->getLanguage() === $this) {
-                $mediaLanguage->setLanguage(null);
-            }
+        if ($this->medias->removeElement($media)) {
+            $media->removeLanguage($this);
         }
 
         return $this;

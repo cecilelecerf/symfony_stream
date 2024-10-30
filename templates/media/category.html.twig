@@ -29,7 +29,7 @@
 					</div>
 				</header>
 
-				{% include "parts/random_movie.html.twig" %}
+				{% include "parts/movie/random_movie.html.twig" %}
 
 
 				{% include "parts/recommendation.html.twig" %}
@@ -39,19 +39,9 @@
 					</div>
 
 					<ul class="mt-4 grid grid-cols-2 gap-y-5 sm:grid-cols-3 gap-x-5">
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
-						{% include "parts/big_movie_card.html.twig" %}
+            {% for media in category.getMedias() %}
+              {% include "parts/movie/big_movie_card.html.twig" %} 
+            {% endfor %}
 					</ul>
 					<button class="flex flex-col items-center mt-9 w-full">
 						<a class="relative flex w-full bg-red-600 flex-row p-3 items-center justify-center rounded-lg overflow-hidden border cursor-pointer transition hover:bg-red-700 text-white">

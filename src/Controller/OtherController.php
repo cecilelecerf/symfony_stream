@@ -19,10 +19,4 @@ class OtherController extends AbstractController
     {
         return $this->render(view: "/other/default.html.twig");
     }
-
-    #[Route(path: '/discover', name: 'discover')]
-    public function discover(): Response
-    {
-        return $this->render(view: "/other/discover.html.twig");
-    }
 }
