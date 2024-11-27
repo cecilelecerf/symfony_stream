@@ -14,11 +14,14 @@ use App\Entity\Subscription;
 use App\Enum\UserAccountStatusEnum;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 
 
 class AppFixtures extends Fixture
 {
+    public function __construct(UserPasswordHasherInterface $passwordHasher) {
+    }
     public function load(ObjectManager $manager): void
     {
 
@@ -35,13 +38,19 @@ class AppFixtures extends Fixture
     {
 
         $users = [];
+    
         for ($i = 0; $i < random_int(10, 20); $i++) {
             $user = new User();
+            $hashedPassword = $passwordHasher->hashPassword(
+                $user,
+                "couocu"
+            );
             $user->setUsername("user_{$i}");
             $user->setEmail("email_{$i}@example.com");
-            $user->setPassword('motdepasse');
+            $user->setPassword($hashedPassword);
             $user->setAccountStatus(UserAccountStatusEnum::ACTIVE);
             $user->setCurrentSubscrition($subscriptions[array_rand($subscriptions)]);
+            $user->setRoles(["ROLE_USER"]);
             $users[] = $user;
             $manager->persist($user);
         }
