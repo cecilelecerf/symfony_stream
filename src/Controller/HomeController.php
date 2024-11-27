@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\PlaylistSubscription;
+use App\Repository\PlaylistSubscriptionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,8 +11,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class HomeController extends AbstractController
 {
     #[Route(path: '/', name: 'index')]
-    public function index(): Response
+    public function index(PlaylistSubscriptionRepository $playlistSubscriptionRepository): Response
     {
-        return $this->render(view: "index.html.twig");
+
+        $user = $playlistSubscriptionRepository->findBy(["user" => 52]);
+        dump($user);
+
+        return $this->render("index.html.twig", ["user" => $user]);
     }
 }

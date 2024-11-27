@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\SubscriptionRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,9 +11,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class OtherController extends AbstractController
 {
     #[Route(path: '/abonnements', name: 'abonnements')]
-    public function abonnements(): Response
+    public function abonnements(UserRepository $userRepository, SubscriptionRepository $subscriptionRepository): Response
     {
-        return $this->render(view: "/other/abonnements.html.twig");
+        $user = $userRepository->find(77);
+
+        $subscriptions = $subscriptionRepository->findAll();
+        dump($subscriptions);
+        return $this->render("/other/abonnements.html.twig", ["user" => $user, "subscriptions" => $subscriptions]);
     }
 
     #[Route(path: '/default', name: 'default')]
