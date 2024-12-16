@@ -2,6 +2,8 @@
 
 namespace App\DataFixtures;
 
+use Faker\Factory;
+use App\Faker\ImageProvider;
 use App\Entity\Category;
 use App\Entity\Language;
 use App\Entity\Movie;
@@ -39,16 +41,18 @@ class AppFixtures extends Fixture
 
     private function generateUsers(ObjectManager $manager, array $subscriptions): array
     {
+        $faker = Factory::create();
+
         $users = [];
 
         for ($i = 0; $i < random_int(10, 20); $i++) {
             $user = new User();
             $hashedPassword = $this->passwordHasher->hashPassword(
                 $user,
-                "couocu"
+                $faker->password()
             );
-            $user->setUsername("user_{$i}");
-            $user->setEmail("email_{$i}@example.com");
+            $user->setUsername($faker->firstname());
+            $user->setEmail($faker->email());
             $user->setPassword($hashedPassword);
             $user->setAccountStatus(UserAccountStatusEnum::ACTIVE);
             $user->setCurrentSubscrition($subscriptions[array_rand($subscriptions)]);
@@ -104,30 +108,34 @@ class AppFixtures extends Fixture
 
     protected function generateMedias(ObjectManager $manager): array
     {
+        $faker = Factory::create();
+        $faker->addProvider(new ImageProvider($faker));
+
+
         /** @var array<Movie|Serie> $medias */
         $medias = [];
         for ($j = 0; $j < random_int(10, 20); $j++) {
             $movie = new Movie();
-            $movie->setTitle("movie_{$j}");
-            $movie->setShortDescription("short description for movie_{$j}");
-            $movie->setLongDescription("long description for movie_{$j}");
-            $movie->setCoverImage("cover_image_{$j}.png");
-            $movie->setReleaseDate(new \DateTime());
-            $movie->setCasting([]);
-            $movie->setStaff([]);
+            $movie->setTitle($faker->sentence(3));
+            $movie->setShortDescription($faker->sentence(10));
+            $movie->setLongDescription($faker->paragraph());
+            $movie->setCoverImage($faker->imageUrl(400, 300));
+            $movie->setReleaseDate($faker->dateTimeBetween('-10 years', 'now'));
+            $movie->setCasting([$faker->lastname(), $faker->lastname(), $faker->lastname()]);
+            $movie->setStaff([$faker->lastname(), $faker->lastname(), $faker->lastname()]);
             $medias[] = $movie;
             $manager->persist($movie);
         }
 
         for ($j = 0; $j < random_int(10, 20); $j++) {
             $serie = new Serie();
-            $serie->setTitle("serie_{$j}");
-            $serie->setShortDescription("short description for serie_{$j}");
-            $serie->setLongDescription("long description for serie_{$j}");
-            $serie->setCoverImage("cover_image_{$j}.png");
-            $serie->setReleaseDate(new \DateTime());
-            $serie->setCasting([]);
-            $serie->setStaff([]);
+            $serie->setTitle($faker->sentence(3));
+            $serie->setShortDescription($faker->sentence(10));
+            $serie->setLongDescription($faker->paragraph());
+            $serie->setCoverImage($faker->imageUrl(400, 300, "movies", true, $faker->sentence(1)));
+            $serie->setReleaseDate($faker->dateTimeBetween('-10 years', 'now'));
+            $serie->setCasting([$faker->lastname(), $faker->lastname(), $faker->lastname()]);
+            $serie->setStaff([$faker->lastname(), $faker->lastname(), $faker->lastname()]);
             $medias[] = $serie;
             $manager->persist($serie);
         }
