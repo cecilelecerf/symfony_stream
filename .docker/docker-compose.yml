@@ -26,7 +26,7 @@ services:
             - symfony_app_var:/var/www/symfony/var
             - symfony_app_vendor:/var/www/symfony/vendor
         networks:
-            - symfony_app
+            - symfony_app 
     nginx:
         build:
             context: ./nginx
@@ -40,6 +40,18 @@ services:
             - symfony_app
         env_file:
             - .env.nginx.local
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        environment:
+            PMA_HOST: db
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        ports:
+            - 8080:80
+        depends_on:
+            - db
+        networks:
+            - symfony_app
 
 volumes:
     symfony_app_var:

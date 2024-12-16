@@ -16,32 +16,34 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-
-
 class AppFixtures extends Fixture
 {
-    public function __construct(UserPasswordHasherInterface $passwordHasher) {
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
     }
+
     public function load(ObjectManager $manager): void
     {
-
         $subscriptions = $this->generateSubscription($manager);
         $users = $this->generateUsers($manager, $subscriptions);
         $medias = $this->generateMedias($manager);
         $categories = $this->generateCategories($manager, $medias);
         $languages = $this->generateLanguages($manager, $medias);
         $playlists = $this->generatePlaylists($manager, $users, $medias);
+
         $manager->flush();
     }
 
-    private function generateUsers(ObjectManager $manager, array $subscriptions)
+    private function generateUsers(ObjectManager $manager, array $subscriptions): array
     {
-
         $users = [];
-    
+
         for ($i = 0; $i < random_int(10, 20); $i++) {
             $user = new User();
-            $hashedPassword = $passwordHasher->hashPassword(
+            $hashedPassword = $this->passwordHasher->hashPassword(
                 $user,
                 "couocu"
             );
@@ -57,6 +59,7 @@ class AppFixtures extends Fixture
 
         return $users;
     }
+
 
     protected function generateLanguages(ObjectManager $manager, array $medias): array
     {

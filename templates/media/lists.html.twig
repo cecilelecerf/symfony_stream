@@ -29,15 +29,18 @@
 			</div>
 
 			<div class="relative w-full flex text-gray-700 font-medium">
-				<select class="appearance-none w-full bg-white border border-gray-200 px-7 py-3 rounded-md shadow transition">
+				<select
+					class="appearance-none w-full bg-white border border-gray-200 px-7 py-3 rounded-md shadow transition">
+					{# {{ dump(playlists) }} #}
+
+
 					{% for playlist in  playlists %}
 						<option value="{{playlist.id}}">#{{loop.index}}
-							-
 							{{playlist.name}}
 							- Liste de
-							{{playlist.author.username}}</option>
+							{# {{playlist.author.username}} #}
+						</option>
 					{% endfor %}
-					{# <option>#1 - Ma liste custom (43 films & 12 séries)</option> #}
 				</select>
 				<div class="pointer-events-none absolute right-2 inset-y-0 flex items-center px-2">
 					<svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24">
@@ -52,6 +55,8 @@
 			{% for media in playlist %}
 				{% include "parts/movie/big_movie_card.html.twig" %}
 			{% endfor %}
+
+
 		</ul>
 		<button class="flex flex-col items-center mt-9 w-full">
 			<div class="relative flex w-full bg-red-600 flex-row p-3 items-center justify-center rounded-lg overflow-hidden border cursor-pointer transition hover:bg-red-700 text-white">

@@ -13,10 +13,9 @@ class OtherController extends AbstractController
     #[Route(path: '/abonnements', name: 'abonnements')]
     public function abonnements(UserRepository $userRepository, SubscriptionRepository $subscriptionRepository): Response
     {
-        $user = $userRepository->find(77);
+        $user = $userRepository->find(78);
 
-        $subscriptions = $subscriptionRepository->findAll();
-        dump($subscriptions);
+        $subscriptions = $subscriptionRepository->findAll(); 
         return $this->render("/other/abonnements.html.twig", ["user" => $user, "subscriptions" => $subscriptions]);
     }
 
