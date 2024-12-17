@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Enum\CommentStatusEnum;
-use App\Enum\UserAccountStatusEnum;
 use App\Repository\CommentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,8 +18,6 @@ class Comment
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\Column(enumType: UserAccountStatusEnum::class)]
-    private UserAccountStatusEnum $accountStatus;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
@@ -29,6 +26,12 @@ class Comment
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Media $media = null;
+
+    #[ORM\Column(type: "string", enumType: CommentStatusEnum::class)]
+    private ?CommentStatusEnum $status = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -47,17 +50,6 @@ class Comment
         return $this;
     }
 
-    public function getAccountStatus(): UserAccountStatusEnum
-    {
-        return $this->accountStatus;
-    }
-
-    public function setAccountStatus(UserAccountStatusEnum $accountStatus): self
-    {
-        $this->accountStatus = $accountStatus;
-
-        return $this;
-    }
 
     public function getAuthor(): ?User
     {
@@ -79,6 +71,30 @@ class Comment
     public function setMedia(?Media $media): self
     {
         $this->media = $media;
+
+        return $this;
+    }
+
+    public function getStatus(): CommentStatusEnum
+    {
+        return $this->status;
+    }
+
+    public function setStatus(CommentStatusEnum $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

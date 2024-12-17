@@ -5,14 +5,17 @@ namespace App\DataFixtures;
 use Faker\Factory;
 use App\Faker\ImageProvider;
 use App\Entity\Category;
+use App\Entity\Comment;
 use App\Entity\Language;
 use App\Entity\Movie;
+use App\Entity\WatchHistory;
 use App\Entity\Serie;
 use App\Entity\User;
 use App\Entity\Playlist;
 use App\Entity\PlaylistMedia;
 use App\Entity\PlaylistSubscription;
 use App\Entity\Subscription;
+use App\Enum\CommentStatusEnum;
 use App\Enum\UserAccountStatusEnum;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -32,10 +35,16 @@ class AppFixtures extends Fixture
         $subscriptions = $this->generateSubscription($manager);
         $users = $this->generateUsers($manager, $subscriptions);
         $medias = $this->generateMedias($manager);
-        $categories = $this->generateCategories($manager, $medias);
-        $languages = $this->generateLanguages($manager, $medias);
-        $playlists = $this->generatePlaylists($manager, $users, $medias);
+        $this->generateCategories($manager, $medias);
+        $this->generateLanguages($manager, $medias);
+        $this->generatePlaylists($manager, $users, $medias);
+        $this->generareComment($manager, $medias, $users);
 
+        // for user test
+        $user = $this->generateUser($manager, $subscriptions);
+        $this->generateUserPlaylist($manager, $user, $medias);
+        $this->generateUserWatchHistory($manager, $medias, $user);
+        $this->generareUserComment($manager, $medias, $user);
         $manager->flush();
     }
 
@@ -117,12 +126,13 @@ class AppFixtures extends Fixture
         for ($j = 0; $j < random_int(10, 20); $j++) {
             $movie = new Movie();
             $movie->setTitle($faker->sentence(3));
-            $movie->setShortDescription($faker->sentence(10));
-            $movie->setLongDescription($faker->paragraph());
+            $movie->setShortDescription($faker->sentence(30));
+            $movie->setLongDescription($faker->paragraph(6));
             $movie->setCoverImage($faker->imageUrl(400, 300));
             $movie->setReleaseDate($faker->dateTimeBetween('-10 years', 'now'));
             $movie->setCasting([$faker->lastname(), $faker->lastname(), $faker->lastname()]);
             $movie->setStaff([$faker->lastname(), $faker->lastname(), $faker->lastname()]);
+            $movie->setDuration(random_int(3600, 8000));
             $medias[] = $movie;
             $manager->persist($movie);
         }
@@ -131,11 +141,12 @@ class AppFixtures extends Fixture
             $serie = new Serie();
             $serie->setTitle($faker->sentence(3));
             $serie->setShortDescription($faker->sentence(10));
-            $serie->setLongDescription($faker->paragraph());
+            $serie->setLongDescription($faker->paragraph(6));
             $serie->setCoverImage($faker->imageUrl(400, 300, "movies", true, $faker->sentence(1)));
             $serie->setReleaseDate($faker->dateTimeBetween('-10 years', 'now'));
             $serie->setCasting([$faker->lastname(), $faker->lastname(), $faker->lastname()]);
             $serie->setStaff([$faker->lastname(), $faker->lastname(), $faker->lastname()]);
+            $serie->setDuration(random_int(3600, 8000));
             $medias[] = $serie;
             $manager->persist($serie);
         }
@@ -195,5 +206,110 @@ class AppFixtures extends Fixture
             $subscriptions[] = $subscription;
         };
         return $subscriptions;
+    }
+
+
+    protected function generareComment(ObjectManager $manager, array $medias, array $users): void
+    {
+        $faker = Factory::create();
+        for ($i = 0; $i < 40; $i++) {
+            $comment = new Comment();
+            $comment->setContent($faker->paragraph());
+            $comment->setStatus(CommentStatusEnum::NOREAD);
+            $comment->setAuthor($faker->randomElement($users));
+            $comment->setMedia($faker->randomElement($medias));
+            $comment->setCreatedAt(new \DateTimeImmutable("-5 years"));
+
+
+            $manager->persist($comment);
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // --------------------------------USER-----------------------------------
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+
+    private function generateUser(ObjectManager $manager, array $subscriptions): User
+    {
+        $user = new User();
+        $hashedPassword = $this->passwordHasher->hashPassword(
+            $user,
+            "user"
+        );
+        $user->setUsername("user");
+        $user->setEmail("user@gmail.com");
+        $user->setPassword($hashedPassword);
+        $user->setAccountStatus(UserAccountStatusEnum::ACTIVE);;
+        $user->setRoles(["ROLE_USER"]);
+        $user->setCurrentSubscrition($subscriptions[array_rand($subscriptions)]);
+
+        $manager->persist($user);
+
+        return $user;
+    }
+
+    protected function generateUserPlaylist(ObjectManager $manager, User $user, array $medias): void
+    {
+        $playlists = [];
+        $now = new \DateTimeImmutable();
+
+
+        $playlist = new Playlist();
+        $playlist->setName("playlist5");
+        $playlist->setAuthor($user);
+        $playlist->setCreatedAt($now);
+        $playlist->setUpdatedAt($now);
+        for ($k = 0; $k < random_int(0, count($medias)); $k++) {
+            $playlistMedia = new PlaylistMedia();
+            $media = $medias[array_rand($medias)];
+            $playlistMedia->setMedia($media);
+            $playlistMedia->setPlaylist($playlist);
+            $playlistMedia->setAddedAt($now);
+            $manager->persist($playlistMedia);
+            $playlist->addPlaylistMedia($playlistMedia);
+        }
+
+        $playlistSubscription = new PlaylistSubscription();
+        $playlistSubscription->setUser($user);
+        $playlistSubscription->setPlaylist($playlist);
+        $playlistSubscription->setSubscribedAt($now);
+        $manager->persist($playlistSubscription);
+
+        $manager->persist($playlist);
+        $playlists[] = $playlist;
+    }
+    public function generateUserWatchHistory(ObjectManager $manager, array $medias, User $user): void
+    {
+        $faker = Factory::create();
+
+        // Create 10 WatchHistory records
+        for ($i = 0; $i < 10; $i++) {
+            $watchHistory = new WatchHistory();
+            $watchHistory->setLastWatched($faker->dateTimeThisYear());
+            $watchHistory->setNumberOfViews($faker->numberBetween(1, 100));
+            $watchHistory->setUser($user);
+            $watchHistory->setMedia($faker->randomElement($medias));
+
+            $manager->persist($watchHistory);
+        }
+    }
+
+    protected function generareUserComment(ObjectManager $manager, array $medias, User $user): void
+    {
+        $faker = Factory::create();
+
+
+
+        $comment = new Comment();
+        $comment->setContent($faker->paragraph());
+        $comment->setStatus(CommentStatusEnum::NOREAD);
+        $comment->setAuthor($user);
+        $comment->setCreatedAt(new \DateTimeImmutable("-5 years"));
+        $comment->setMedia($faker->randomElement($medias));
+        $manager->persist($comment);
     }
 }

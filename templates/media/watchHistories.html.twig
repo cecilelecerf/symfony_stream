@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique de visionnage{% endblock %}
+
+{% block content_layout %}
+	<section class="">
+
+    <div class="container">
+        <h1 class="text-2xl font-semibold">Historique des films et séries vus</h1>
+        
+        {% if watchHistories is empty %}
+            <p class="text-gray-500">Vous n'avez pas encore regardé de films ou séries.</p>
+        {% else %}
+            <div class="mt-4">
+                <h2 class="text-xl font-semibold">Films vus</h2>
+                <ul>
+                    {% for watchHistory in watchHistories %}
+                        {% if watchHistory.media.isFilm()  %}
+                            <li class="mb-4">
+                                <a href="{{ path('detail', {'id': watchHistory.media.id}) }}" class="flex items-center space-x-4">
+                                    <img src="{{ watchHistory.media.coverImage }}" alt="{{ watchHistory.media.title }}" class="w-16 h-24 object-cover rounded">
+                                    <div>
+                                        <p class="text-lg font-medium">{{ watchHistory.media.title }}</p>
+                                        <p class="text-sm text-gray-500">Vu {{ watchHistory.numberOfViews }} fois</p>
+                                        <p class="text-xs text-gray-400">Dernière vue : {{ watchHistory.lastWatched|date('d/m/Y H:i') }}</p>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="mt-4">
+                <h2 class="text-xl font-semibold">Séries vues</h2>
+                <ul>
+                    {% for watchHistory in watchHistories %}
+                        {% if watchHistory.media.isFilm() == false %}
+                            <li class="mb-4">
+                                <a href="{{ path('detail', {'id': watchHistory.media.id}) }}" class="flex items-center space-x-4">
+                                    <img src="{{ watchHistory.media.coverImage }}" alt="{{ watchHistory.media.title }}" class="w-16 h-24 object-cover rounded">
+                                    <div>
+                                        <p class="text-lg font-medium">{{ watchHistory.media.title }}</p>
+                                        <p class="text-sm text-gray-500">Vu {{ watchHistory.numberOfViews }} fois</p>
+                                        <p class="text-xs text-gray-400">Dernière vue : {{ watchHistory.lastWatched|date('d/m/Y H:i') }}</p>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+    </section>
+{% endblock %}

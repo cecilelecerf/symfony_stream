@@ -74,6 +74,9 @@ class Media
     #[ORM\Column]
     private array $casting = [];
 
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $duration = null;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -318,5 +321,17 @@ class Media
         }
 
         return 'média'; // Valeur par défaut
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(int $duration): self
+    {
+        $this->duration = $duration;
+
+        return $this;
     }
 }
