@@ -41,12 +41,11 @@ class LoginController extends AbstractController
             $user->setPassword($hashedPassword);
             $user->setRoles(["ROLE_USER"]);
             $user->setAccountStatus(UserAccountStatusEnum::ACTIVE);
-            // Sauvegarde l'utilisateur en base de données
             $entityManager->persist($user);
             $entityManager->flush();
 
             // Redirige après l'enregistrement
-            return $this->redirectToRoute('index');
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render("/auth/register.html.twig",  [
