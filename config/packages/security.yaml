@@ -49,6 +49,9 @@ security:
         # Rediriger vers /login pour les utilisateurs non connectés
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/forgot, roles: PUBLIC_ACCESS }
+        - { path: ^/reset, roles: PUBLIC_ACCESS }
+        - { path: ^/confirm, roles: PUBLIC_ACCESS }
         - { path: ^/.*, roles: ROLE_USER }
 
 

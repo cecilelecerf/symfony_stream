@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,13 +12,43 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Form\RegistrationFormType;
 use App\Enum\UserAccountStatusEnum;
+use App\Form\ResetForm;
+use App\Repository\UserRepository;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Twig\Environment;
 
 class LoginController extends AbstractController
 {
     #[Route(path: '/forgot', name: 'forgot')]
-    public function forgot(): Response
-    {
-        return $this->render(view: "/auth/forgot.html.twig");
+    public function forgot(
+        Request $request,
+        UserRepository $userRepository,
+        MailerInterface $mailer,
+        EntityManagerInterface $entityManager,
+        Environment $twig,
+
+    ): Response {
+        $email = $request->get('_email');
+        if ($email) {
+            $user = $userRepository->findOneBy(['email' => $email]);
+            $resetPasswordToken = Uuid::v4()->toRfc4122();
+            $user->setResetPasswordToken($resetPasswordToken);
+            $entityManager->flush();
+            $email = (new Email())
+                ->from('contact@streemi.fr')
+                ->to($user->getEmail())
+                ->subject('Mot de passe oublié')
+                ->html($twig->render('emails/forgot.html.twig', ['user' => $user]));
+
+            $mailer->send($email);
+
+            $this->addFlash('success', "Un email a été envoyé si l'email existe ");
+        } else {
+            $this->addFlash('error', "Un email n'sa été envoyé si l'email existe ");
+        }
+        return $this->render("/auth/forgot.html.twig");
     }
     #[Route(path: '/register', name: 'app_register')]
     public function register(
@@ -25,15 +56,10 @@ class LoginController extends AbstractController
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher
     ): Response {
-        // Crée un nouvel utilisateur
         $user = new User();
-
-        // Crée le formulaire et gère la requête
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
-        // Vérifie si le formulaire est soumis et valide
         if ($form->isSubmitted() && $form->isValid()) {
-            // Hash le mot de passe
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
                 $form->get("password")->getData()
@@ -43,8 +69,6 @@ class LoginController extends AbstractController
             $user->setAccountStatus(UserAccountStatusEnum::ACTIVE);
             $entityManager->persist($user);
             $entityManager->flush();
-
-            // Redirige après l'enregistrement
             return $this->redirectToRoute('app_login');
         }
 
@@ -53,14 +77,35 @@ class LoginController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/reset', name: 'reset')]
-    public function reset(): Response
-    {
-        return $this->render(view: "/auth/reset.html.twig");
-    }
-    #[Route(path: '/confirm', name: 'confirm')]
-    public function confirm(): Response
-    {
-        return $this->render(view: "/auth/confirm.html.twig");
+    #[Route(path: '/reset/{uid}', name: 'reset')]
+    public function reset(
+        string $uid,
+        UserRepository $userRepository,
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        $user = $userRepository->findOneBy(["resetPasswordToken" => $uid]);
+        if (!$user) {
+            $this->addFlash('error', 'Token de réinitialisation invalide');
+            return $this->redirectToRoute('forgot');
+        }
+        $form = $this->createForm(ResetForm::class, $user);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $hashedPassword = $passwordHasher->hashPassword(
+                $user,
+                $form->get("password")->getData()
+            );
+            $user->setPassword($hashedPassword);
+            $user->setResetPasswordToken(null);
+            $entityManager->persist($user);
+            $entityManager->flush();
+            $this->redirectToRoute('app_login');
+        }
+        return $this->render("/auth/reset.html.twig", [
+            'resetForm' => $form->createView(),
+        ]);
     }
 }

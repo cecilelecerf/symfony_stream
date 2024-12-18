@@ -27,6 +27,8 @@ services:
             - symfony_app_vendor:/var/www/symfony/vendor
         networks:
             - symfony_app 
+        expose:
+            - "9000" 
     nginx:
         build:
             context: ./nginx
@@ -50,6 +52,15 @@ services:
             - 8080:80
         depends_on:
             - db
+        networks:
+            - symfony_app
+            
+    mailhog:
+        image: mailhog/mailhog
+        container_name: mailhog
+        ports:
+            - "1025:1025"  # SMTP Server
+            - "8025:8025"  # Web UI
         networks:
             - symfony_app
 

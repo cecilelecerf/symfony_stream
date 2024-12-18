@@ -52,6 +52,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: PlaylistSubscription::class, orphanRemoval: true)]
     private Collection $playlistSubscriptions;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $resetPasswordToken = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $confirmCode = null;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -88,7 +94,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-        /**
+    /**
      * @see UserInterface
      */
     public function eraseCredentials(): void
@@ -307,6 +313,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $playlistSubscription->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getResetPasswordToken(): ?string
+    {
+        return $this->resetPasswordToken;
+    }
+
+    public function setResetPasswordToken(?string $resetPasswordToken): self
+    {
+        $this->resetPasswordToken = $resetPasswordToken;
+
+        return $this;
+    }
+
+    public function getConfirmCode(): ?string
+    {
+        return $this->confirmCode;
+    }
+
+    public function setConfirmCode(?string $confirmCode): self
+    {
+        $this->confirmCode = $confirmCode;
 
         return $this;
     }
