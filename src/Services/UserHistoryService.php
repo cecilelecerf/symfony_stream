@@ -29,8 +29,8 @@ class UserHistoryService
             return $this->watchHistoryRepository->findBy(
                 [
                     'user' => $user,
-                    'media' => $this->movieRepository->findAll() // Filtrer uniquement les films en utilisant un autre repository pour trouver les films
-                ], // Filter by user
+                    'media' => $this->movieRepository->findAll()
+                ],
                 ['lastWatched' => 'DESC'], // Sort by last watched date in descending order
                 3, // Limit to 3 results
                 0  // No offset
