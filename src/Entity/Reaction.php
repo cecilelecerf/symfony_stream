@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\ReactionTypeEnum;
 use App\Repository\ReactionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,8 +14,8 @@ class Reaction
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private array $type = [];
+    #[ORM\Column(enumType: ReactionTypeEnum::class)]
+    private ReactionTypeEnum $type;
 
     #[ORM\ManyToOne(inversedBy: 'reactions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -35,12 +36,12 @@ class Reaction
         return $this->id;
     }
 
-    public function getType(): array
+    public function getType(): ReactionTypeEnum
     {
         return $this->type;
     }
 
-    public function setType(array $type): self
+    public function setType(ReactionTypeEnum $type): self
     {
         $this->type = $type;
 

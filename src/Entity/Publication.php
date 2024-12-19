@@ -32,7 +32,7 @@ class Publication
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'publications')]
-    private Collection $tag;
+    private Collection $tags;
 
     #[ORM\OneToMany(mappedBy: 'publication', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comments;
@@ -42,7 +42,7 @@ class Publication
 
     public function __construct()
     {
-        $this->tag = new ArrayCollection();
+        $this->tags = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->reactions = new ArrayCollection();
     }
@@ -117,13 +117,13 @@ class Publication
      */
     public function getTag(): Collection
     {
-        return $this->tag;
+        return $this->tags;
     }
 
     public function addTag(Tag $tag): self
     {
-        if (!$this->tag->contains($tag)) {
-            $this->tag->add($tag);
+        if (!$this->tags->contains($tag)) {
+            $this->tags->add($tag);
         }
 
         return $this;
@@ -131,7 +131,7 @@ class Publication
 
     public function removeTag(Tag $tag): self
     {
-        $this->tag->removeElement($tag);
+        $this->tags->removeElement($tag);
 
         return $this;
     }

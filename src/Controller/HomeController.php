@@ -8,11 +8,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
 {
-    #[Route(path: '/', name: 'index', defaults: ['mediaType' => 'serie'])]
+    #[Route(path: '/', name: 'index')]
     public function index(): Response
     {
-
-
 
         return $this->render("index.html.twig");
     }
