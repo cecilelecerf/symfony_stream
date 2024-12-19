@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\PlaylistSubscription;
+use App\Entity\Publication;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<PlaylistSubscription>
+ * @extends ServiceEntityRepository<Publication>
  *
- * @method PlaylistSubscription|null find($id, $lockMode = null, $lockVersion = null)
- * @method PlaylistSubscription|null findOneBy(array $criteria, array $orderBy = null)
- * @method PlaylistSubscription[]    findAll()
- * @method PlaylistSubscription[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Publication|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Publication|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Publication[]    findAll()
+ * @method Publication[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class PlaylistSubscriptionRepository extends ServiceEntityRepository
+class PublicationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, PlaylistSubscription::class);
+        parent::__construct($registry, Publication::class);
     }
 
-    public function save(PlaylistSubscription $entity, bool $flush = false): void
+    public function save(Publication $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class PlaylistSubscriptionRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(PlaylistSubscription $entity, bool $flush = false): void
+    public function remove(Publication $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class PlaylistSubscriptionRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return PlaylistSubscription[] Returns an array of PlaylistSubscription objects
+//     * @return Publication[] Returns an array of Publication objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class PlaylistSubscriptionRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?PlaylistSubscription
+//    public function findOneBySomeField($value): ?Publication
 //    {
 //        return $this->createQueryBuilder('p')
 //            ->andWhere('p.exampleField = :val')
